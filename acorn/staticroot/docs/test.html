@@ -1,0 +1,21 @@
+
+<form id="search" method="GET" action="/build_html">
+Filename:
+<input type="text" name="fname" size="24" maxlength="256" value="myfile"/>
+<BR>Content:
+<textarea cols=50 rows=10 name="selectText">
+.. select:: mongodb:
+   * disease_test_condprob format=ctslide
+   * NJ_connectivity format=question
+
+</textarea>
+<BR>Make:
+<select name="outputFormat">
+<option SELECTED value="html">web page</option>
+<option value="beamer">Slides</option>
+<option value="latex">Document</option>
+<option value="socraticqs">Socraticqs</option>
+</select>
+<input type="submit"/>
+</form>
+
