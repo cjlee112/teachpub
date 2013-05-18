@@ -1,7 +1,7 @@
 import cherrypy
 import thread
 import subprocess
-from reusabletext import mongo, parse, ctprep
+from reusabletext import mongo, parse, ctprep, vanilla
 from socraticqs import question
 import socraticqs.web
 import json
@@ -43,7 +43,8 @@ def setup_questions(tree):
 
 class Server(object):
     def __init__(self, sourceDir="sphinx_source", 
-                 buildDir='staticroot/docs', docIndex=None, formatIndex=None):
+                 buildDir='staticroot/docs', docIndex=None, formatIndex=None,
+                 noCachePragma=''):
         #if not docIndex:
         #    docIndex = mongo.DocIDIndex()
         #if not formatIndex:
@@ -53,6 +54,10 @@ class Server(object):
         self.sourceDir = sourceDir
         self.buildDir = buildDir
         self.latexDocs = {}
+        self.coll = mongo.get_collection()
+        formatDict = parse.read_formats('vanilla_formats.rst')
+        self.reformatter = vanilla.Reformatter(formatDict)
+        self.noCachePragma = noCachePragma
 
     def start(self):
         'start cherrypy server as background thread, retaining control of main thread'
@@ -70,6 +75,7 @@ class Server(object):
             return self.init_socraticqs(fname, stree)
         path = os.path.join(self.sourceDir, fname + '.rst')
         with open(path, 'w') as ofile:
+            ofile.write(self.noCachePragma)
             ofile.write(parse.get_text(stree))
         if outputFormat == 'beamer':
             texfile = ctprep.make_tex(path, usePDFpages) # run rst2beamer
@@ -97,6 +103,21 @@ class Server(object):
             return redirect('/docs/%s.pdf' % fname)
     build_html.exposed = True
 
+    def search(self, query):
+        l = mongo.text_search(self.coll, query, limit=100)
+        searchDocs = [t[0] for t in l]
+        outfile = os.path.join(self.sourceDir, 'results.rst')
+        vanilla.render_docs(searchDocs, self.reformatter, outfile,
+                            self.noCachePragma + '''
+**Search results: %d documents** (click on titles shown on the left
+to jump to a specific document)
+
+''' % len(searchDocs))
+        cmdline.main(['sphinx-build',  # build desired output via sphinx
+                      self.sourceDir, self.buildDir, outfile])
+        return redirect('/docs/results.html')
+    search.exposed = True
+    
     def init_socraticqs(self, fname, stree):
         #qlist = setup_questions(stree)
         qset = ctprep.get_questions(stree)
