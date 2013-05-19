@@ -58,6 +58,7 @@ class Server(object):
         formatDict = parse.read_formats('vanilla_formats.rst')
         self.reformatter = vanilla.Reformatter(formatDict)
         self.noCachePragma = noCachePragma
+        self.course = {}
 
     def start(self):
         'start cherrypy server as background thread, retaining control of main thread'
@@ -124,22 +125,38 @@ to jump to a specific document)
         ctprep.save_question_csv(qset, fname + '.csv', parse.PostprocDict,
                                  '/staticroot/images')
         adminIP = cherrypy.request.remote.ip
-        self.socraticqs = socraticqs.web.Server(fname + '.csv',
-                                                adminIP=adminIP,
-                                                configPath=None,
-                                                mathJaxPath=None)
-        return self.socraticqs.admin()
+        cherrypy.session['courseID'] = fname
+        dbfile = fname + '.db'
+        self.course[fname] = socraticqs.web.Server(fname + '.csv',
+                                                   adminIP=adminIP,
+                                                   configPath=None,
+                                                   mathJaxPath=None,
+                                                   dbfile=dbfile)
+        return '''%d concept tests loaded.  Click here to launch the 
+<A HREF="/admin" TARGET="admin">instructor interface</A>.
+Click here to launch the 
+<A HREF="/" TARGET="student">student interface</A>. 
+''' % len(qset.children)
         
     # forward the socraticqs web interface calls
-    socraticqsMethods = ('index', 'login', 'login_form', 'logout',
+    socraticqsMethods = ('login', 'login_form', 'logout',
                          'register_form', 'register', 'reconsider_form',
                          'view', 'submit', 'admin', 'start_question',
                          'qadmin', 'qassess', 'save_responses', 'exit')
     for attr in socraticqsMethods:
-        exec '''%s=lambda self, **kwargs:self.socraticqs.%s(**kwargs)
+        exec '''%s=lambda self, **kwargs:self.call_socraticqs("%s", **kwargs)
 %s.exposed = True''' % (attr, attr, attr)
     del socraticqsMethods, attr # don't leave clutter in class attributes
 
+    def call_socraticqs(self, m, **kwargs):
+        courseID = cherrypy.session['courseID']
+        return getattr(self.course[courseID], m)(**kwargs)
+
+    def index(self, **kwargs):
+        if 'courseID' in cherrypy.session: # student interface
+            return self.call_socraticqs('index', **kwargs)
+        return redirect('/docs/test.html') # test form for instructors
+    index.exposed = True
 
             
 
