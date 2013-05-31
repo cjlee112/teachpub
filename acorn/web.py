@@ -44,13 +44,13 @@ def setup_questions(tree):
 class Server(object):
     def __init__(self, sourceDir="sphinx_source", 
                  buildDir='staticroot/docs', docIndex=None, formatIndex=None,
-                 noCachePragma=''):
-        #if not docIndex:
-        #    docIndex = mongo.DocIDIndex()
-        #if not formatIndex:
-        #    formatIndex = mongo.FormatIndex()
-        #self.docIndex = docIndex
-        #self.formatIndex = formatIndex
+                 noCachePragma='', **kwargs):
+        if not docIndex:
+            docIndex = mongo.DocIDIndex(**kwargs)
+        if not formatIndex:
+            formatIndex = mongo.FormatIndex(**kwargs)
+        self.docIndex = docIndex
+        self.formatIndex = formatIndex
         self.sourceDir = sourceDir
         self.buildDir = buildDir
         self.latexDocs = {}
@@ -69,7 +69,8 @@ class Server(object):
 
     def build_html(self, fname, selectText, outputFormat='html'):
         rawtext = selectText.split('\n')
-        stree = parse.parse_rust(rawtext, fname)
+        stree = parse.parse_rust(rawtext, fname, mongoIndex=self.docIndex,
+                                 mongoFormats=self.formatIndex)
         usePDFpages = ctprep.check_fileselect(stree)
         parse.apply_select(stree)
         if outputFormat == 'socraticqs':
