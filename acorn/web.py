@@ -40,6 +40,27 @@ def setup_questions(tree):
         l.append(qObj)
     return l
 
+unauthorizedQ = '''
+
+Unauthorized Request
+--------------------
+
+You have requested a question that is not publicly accessible
+but have not authenticated your identity.
+'''
+
+
+
+def filter_questions(tree, replaceText=unauthorizedQ):
+    for i,c in enumerate(tree.children):
+        if getattr(c, 'tokens', ('skip',))[0] != ':question:':
+            filter_questions(c) # recurse to filter subtree
+        elif hasattr(c, 'selectParams') \
+               and 'public' not in getattr(c, '_metadata', {}) \
+               .get('access', ()): # block access
+            rtree = parse.parse_rust(replaceText.split('\n'), 'temp')
+            tree.children[i] = rtree.children[0]
+
 
 class Server(object):
     def __init__(self, sourceDir="sphinx_source", 
@@ -74,6 +95,7 @@ class Server(object):
                                  mongoFormats=self.formatIndex)
         usePDFpages = ctprep.check_fileselect(stree)
         parse.apply_select(stree)
+        filter_questions(stree)
         if outputFormat == 'socraticqs':
             return self.init_socraticqs(fname, stree)
         path = os.path.join(self.sourceDir, fname + '.rst')
