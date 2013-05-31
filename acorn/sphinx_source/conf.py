@@ -186,8 +186,11 @@ latex_elements = {
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
-with open('latexdocs.json', 'r') as ifile:
-    latex_documents = json.load(ifile).values()
+try:
+    with open('latexdocs.json', 'r') as ifile:
+        latex_documents = json.load(ifile).values()
+except IOError:
+    latex_documents = []
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
