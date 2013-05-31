@@ -54,7 +54,7 @@ class Server(object):
         self.sourceDir = sourceDir
         self.buildDir = buildDir
         self.latexDocs = {}
-        self.coll = mongo.get_collection()
+        self.coll = mongo.get_collection(**kwargs)
         formatDict = parse.read_formats('vanilla_formats.rst')
         self.reformatter = vanilla.Reformatter(formatDict)
         self.noCachePragma = noCachePragma
