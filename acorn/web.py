@@ -44,7 +44,7 @@ def setup_questions(tree):
 class Server(object):
     def __init__(self, sourceDir="sphinx_source", 
                  buildDir='staticroot/docs', docIndex=None, formatIndex=None,
-                 noCachePragma='', **kwargs):
+                 noCachePragma='', imageDir='sphinx_source', **kwargs):
         if not docIndex:
             docIndex = mongo.DocIDIndex(**kwargs)
         if not formatIndex:
@@ -53,6 +53,7 @@ class Server(object):
         self.formatIndex = formatIndex
         self.sourceDir = sourceDir
         self.buildDir = buildDir
+        self.imageDir = imageDir
         self.latexDocs = {}
         self.coll = mongo.get_collection(**kwargs)
         formatDict = parse.read_formats('vanilla_formats.rst')
@@ -124,7 +125,7 @@ to jump to a specific document)
         #qlist = setup_questions(stree)
         qset = ctprep.get_questions(stree)
         ctprep.save_question_csv(qset, fname + '.csv', parse.PostprocDict,
-                                 '/staticroot/images')
+                                 'staticroot/images', self.imageDir)
         adminIP = cherrypy.request.remote.ip
         cherrypy.session['courseID'] = fname
         dbfile = fname + '.db'
