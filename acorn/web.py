@@ -51,21 +51,26 @@ but have not authenticated your identity.
 
 
 
-def filter_questions(tree, replaceText=unauthorizedQ):
+def secure_questions(tree, publicOnly=True, replaceText=unauthorizedQ):
+    nonpublic = 0
     for i,c in enumerate(tree.children):
-        if getattr(c, 'tokens', ('skip',))[0] != ':question:':
-            filter_questions(c) # recurse to filter subtree
+        if getattr(c, 'tokens', ('skip',))[0] != ':question:': # filter subtree
+            nonpublic += secure_questions(c, publicOnly, replaceText)
         elif hasattr(c, 'selectParams') \
                and 'public' not in getattr(c, '_metadata', {}) \
-               .get('access', ()): # block access
-            rtree = parse.parse_rust(replaceText.split('\n'), 'temp')
-            tree.children[i] = rtree.children[0]
-
+               .get('access', ()):
+            nonpublic += 1 # count non-public questions
+            if publicOnly: # block access
+                print 'block access, publicOnly=%d' % publicOnly
+                rtree = parse.parse_rust(replaceText.split('\n'), 'temp')
+                tree.children[i] = rtree.children[0]
+    return nonpublic
 
 class Server(object):
     def __init__(self, sourceDir="sphinx_source", 
                  buildDir='staticroot/docs', docIndex=None, formatIndex=None,
-                 noCachePragma='', imageDir='sphinx_source', **kwargs):
+                 noCachePragma='', imageDir='sphinx_source', 
+                 privateDir='staticroot/private', **kwargs):
         if not docIndex:
             docIndex = mongo.DocIDIndex(**kwargs)
         if not formatIndex:
@@ -74,6 +79,7 @@ class Server(object):
         self.formatIndex = formatIndex
         self.sourceDir = sourceDir
         self.buildDir = buildDir
+        self.privateDir = privateDir
         self.imageDir = imageDir
         self.latexDocs = {}
         self.coll = mongo.get_collection(**kwargs)
@@ -89,15 +95,22 @@ class Server(object):
     def serve_forever(self):
         cherrypy.quickstart(self, '/', 'cp.conf')
 
-    def build_html(self, fname, selectText, outputFormat='html'):
+    def build_html(self, fname, selectText, outputFormat='html', publicOnly=1):
+        publicOnly = int(publicOnly)
         rawtext = selectText.split('\n')
         stree = parse.parse_rust(rawtext, fname, mongoIndex=self.docIndex,
                                  mongoFormats=self.formatIndex)
         usePDFpages = ctprep.check_fileselect(stree)
         parse.apply_select(stree)
-        filter_questions(stree)
         if outputFormat == 'socraticqs':
+            secure_questions(stree, True) # remove non-public questions
             return self.init_socraticqs(fname, stree)
+        nonpublic = secure_questions(stree, publicOnly)
+        if publicOnly or nonpublic == 0:
+            outputDir = self.buildDir
+        else:
+            outputDir = self.privateDir
+        webroot = os.path.basename(outputDir)
         path = os.path.join(self.sourceDir, fname + '.rst')
         with open(path, 'w') as ofile:
             ofile.write(self.noCachePragma)
@@ -105,9 +118,9 @@ class Server(object):
         if outputFormat == 'beamer':
             texfile = ctprep.make_tex(path, usePDFpages) # run rst2beamer
             subprocess.call(['pdflatex', '-output-directory', 
-                             self.buildDir, '-interaction=batchmode',
+                             outputDir, '-interaction=batchmode',
                              texfile])
-            return redirect('/docs/%s.pdf' % fname)
+            return redirect('/%s/%s.pdf' % (webroot, fname))
         elif outputFormat == 'latex': # add to sphinx conf.py latexdocs
             self.latexDocs[fname] = (fname, fname + '.tex', 'The Title',
                                      'the Author', 'howto')
@@ -116,16 +129,16 @@ class Server(object):
                 json.dump(self.latexDocs, ifile)
 
         cmdline.main(['sphinx-build', '-b', outputFormat,
-                      self.sourceDir, self.buildDir, 
+                      self.sourceDir, outputDir, 
                       path]) # build desired output via sphinx
         if outputFormat == 'html':
-            return redirect('/docs/%s.html' % fname)
+            return redirect('/%s/%s.html' % (webroot, fname))
         elif outputFormat == 'latex': # need to run pdflatex
-            texfile = os.path.join(self.buildDir, fname + '.tex')
+            texfile = os.path.join(outputDir, fname + '.tex')
             subprocess.call(['pdflatex', '-output-directory', 
-                             self.buildDir, '-interaction=batchmode',
+                             outputDir, '-interaction=batchmode',
                              texfile])
-            return redirect('/docs/%s.pdf' % fname)
+            return redirect('/%s/%s.pdf' % (webroot, fname))
     build_html.exposed = True
 
     def search(self, query):
