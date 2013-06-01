@@ -6,9 +6,15 @@ Filename:
 <textarea cols=50 rows=10 name="selectText">
 .. select:: mongodb:
    * disease_test_condprob format=ctslide
-   * NJ_connectivity format=question
+   * NJ_connectivity format=ctslide
 
 </textarea>
+<BR>
+<select name="publicOnly">
+<option SELECTED value="1">Exclude private</option>
+<option value="0">Allow private</option>
+</select>
+questions (if you include private questions, you will be asked for a password). 
 <BR>Make:
 <select name="outputFormat">
 <option SELECTED value="html">web page</option>
