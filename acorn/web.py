@@ -6,6 +6,8 @@ from socraticqs import question
 import socraticqs.web
 import json
 import os.path
+import tempfile
+import shutil
 try:
     from sphinx import cmdline
 except ImportError:
@@ -66,6 +68,18 @@ def secure_questions(tree, publicOnly=True, replaceText=unauthorizedQ):
                 tree.children[i] = rtree.children[0]
     return nonpublic
 
+def cprmtemp(srcdir, fname, destdir):
+    'copy file to dest and remove srcdir'
+    shutil.copyfile(os.path.join(srcdir, fname), os.path.join(destdir, fname))
+    shutil.rmtree(srcdir)
+
+def pdflatex(srcdir, fname, destdir):
+    'run pdflatex with tempdir to prevent nasty side effects'
+    tempDir = tempfile.mkdtemp()
+    subprocess.call(['pdflatex', '-output-directory', tempDir,
+                     '-interaction=batchmode', fname + '.tex'], cwd=srcdir)
+    cprmtemp(tempDir, fname + '.pdf', destdir)
+
 class Server(object):
     def __init__(self, sourceDir="sphinx_source", 
                  buildDir='staticroot/docs', docIndex=None, formatIndex=None,
@@ -110,16 +124,15 @@ class Server(object):
             outputDir = self.buildDir
         else:
             outputDir = self.privateDir
+        outputDir = os.path.abspath(outputDir)
         webroot = os.path.basename(outputDir)
         path = os.path.join(self.sourceDir, fname + '.rst')
         with open(path, 'w') as ofile:
             ofile.write(self.noCachePragma)
             ofile.write(parse.get_text(stree))
         if outputFormat == 'beamer':
-            texfile = ctprep.make_tex(path, usePDFpages) # run rst2beamer
-            subprocess.call(['pdflatex', '-output-directory', 
-                             outputDir, '-interaction=batchmode',
-                             texfile])
+            ctprep.make_tex(path, usePDFpages) # run rst2beamer
+            pdflatex(self.sourceDir, fname, outputDir)
             return redirect('/%s/%s.pdf' % (webroot, fname))
         elif outputFormat == 'latex': # add to sphinx conf.py latexdocs
             self.latexDocs[fname] = (fname, fname + '.tex', 'The Title',
@@ -127,18 +140,19 @@ class Server(object):
             with open(os.path.join(self.sourceDir, 'latexdocs.json'), 
                       'w') as ifile:
                 json.dump(self.latexDocs, ifile)
-
-        cmdline.main(['sphinx-build', '-b', outputFormat,
-                      self.sourceDir, outputDir, 
-                      path]) # build desired output via sphinx
-        if outputFormat == 'html':
-            return redirect('/%s/%s.html' % (webroot, fname))
-        elif outputFormat == 'latex': # need to run pdflatex
-            texfile = os.path.join(outputDir, fname + '.tex')
-            subprocess.call(['pdflatex', '-output-directory', 
-                             outputDir, '-interaction=batchmode',
-                             texfile])
+            texDir = os.path.join(self.sourceDir, '_build', 'latex')
+            cmdline.main(['sphinx-build', '-b', outputFormat,
+                          self.sourceDir, texDir, 
+                          path]) # build latex
+            pdflatex(texDir, fname, outputDir)
             return redirect('/%s/%s.pdf' % (webroot, fname))
+        elif outputFormat == 'html':
+            cmdline.main(['sphinx-build', '-b', outputFormat,
+                          self.sourceDir, outputDir, 
+                          path]) # build html
+            return redirect('/%s/%s.html' % (webroot, fname))
+        else:
+            raise ValueError('unknown format: ' + outputFormat)
     build_html.exposed = True
 
     def search(self, query):
