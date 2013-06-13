@@ -51,7 +51,9 @@ You have requested a question that is not publicly accessible
 but have not authenticated your identity.
 '''
 
-
+def is_public(c):
+    return getattr(c, 'tokens', ('skip',))[0] != ':question:' \
+        or 'public' in getattr(c, '_metadata', {}).get('access', ())
 
 def secure_questions(tree, publicOnly=True, replaceText=unauthorizedQ):
     nonpublic = 0
@@ -80,11 +82,17 @@ def pdflatex(srcdir, fname, destdir):
                      '-interaction=batchmode', fname + '.tex'], cwd=srcdir)
     cprmtemp(tempDir, fname + '.pdf', destdir)
 
+def build_livetutorial(srcdir, destdir):
+    cmdline.main(['sphinx-build', '-b', 'html', srcdir, destdir])
+
+
 class Server(object):
     def __init__(self, sourceDir="sphinx_source", 
                  buildDir='staticroot/docs', docIndex=None, formatIndex=None,
                  noCachePragma='', imageDir='sphinx_source', 
-                 privateDir='staticroot/private', **kwargs):
+                 privateDir='staticroot/private', 
+                 liveTutorial='../livetutorial', 
+                 startPage='/docs/tutorial/basic.html', **kwargs):
         if not docIndex:
             docIndex = mongo.DocIDIndex(**kwargs)
         if not formatIndex:
@@ -95,12 +103,16 @@ class Server(object):
         self.buildDir = buildDir
         self.privateDir = privateDir
         self.imageDir = imageDir
+        self.startPage = startPage
         self.latexDocs = {}
         self.coll = mongo.get_collection(**kwargs)
         formatDict = parse.read_formats('vanilla_formats.rst')
         self.reformatter = vanilla.Reformatter(formatDict)
         self.noCachePragma = noCachePragma
         self.course = {}
+        if liveTutorial:
+            build_livetutorial(liveTutorial, 
+                               os.path.join(buildDir, 'tutorial'))
 
     def start(self):
         'start cherrypy server as background thread, retaining control of main thread'
@@ -109,34 +121,44 @@ class Server(object):
     def serve_forever(self):
         cherrypy.quickstart(self, '/', 'cp.conf')
 
-    def build_html(self, fname, selectText, outputFormat='html', publicOnly=1):
+    def get_output_dir(self, publicOnly):
+        if publicOnly:
+            return self.buildDir
+        else:
+            return self.privateDir
+
+    def build_html(self, fname, selectText, outputFormat='html', publicOnly=1,
+                   beamerTheme=None, docTitle='My Presentation', 
+                   author='the Author'):
         publicOnly = int(publicOnly)
         rawtext = selectText.split('\n')
-        stree = parse.parse_rust(rawtext, fname, mongoIndex=self.docIndex,
-                                 mongoFormats=self.formatIndex)
+        stree,t,a = parse.parse_rust_docinfo(rawtext, fname, 
+                                             mongoIndex=self.docIndex,
+                                             mongoFormats=self.formatIndex)
+        if t:
+            docTitle = t
+        if a:
+            author = a
         usePDFpages = ctprep.check_fileselect(stree)
         parse.apply_select(stree)
         if outputFormat == 'socraticqs':
             secure_questions(stree, True) # remove non-public questions
             return self.init_socraticqs(fname, stree)
         nonpublic = secure_questions(stree, publicOnly)
-        if publicOnly or nonpublic == 0:
-            outputDir = self.buildDir
-        else:
-            outputDir = self.privateDir
+        outputDir = self.get_output_dir(publicOnly or nonpublic == 0)
         outputDir = os.path.abspath(outputDir)
         webroot = os.path.basename(outputDir)
         path = os.path.join(self.sourceDir, fname + '.rst')
         with open(path, 'w') as ofile:
             ofile.write(self.noCachePragma)
             ofile.write(parse.get_text(stree))
-        if outputFormat == 'beamer':
-            ctprep.make_tex(path, usePDFpages) # run rst2beamer
+        if outputFormat == 'beamer': # run rst2beamer
+            ctprep.make_tex(path, usePDFpages, beamerTheme, docTitle)
             pdflatex(self.sourceDir, fname, outputDir)
             return redirect('/%s/%s.pdf' % (webroot, fname))
         elif outputFormat == 'latex': # add to sphinx conf.py latexdocs
-            self.latexDocs[fname] = (fname, fname + '.tex', 'The Title',
-                                     'the Author', 'howto')
+            self.latexDocs[fname] = (fname, fname + '.tex', docTitle,
+                                     author, 'howto')
             with open(os.path.join(self.sourceDir, 'latexdocs.json'), 
                       'w') as ifile:
                 json.dump(self.latexDocs, ifile)
@@ -155,9 +177,12 @@ class Server(object):
             raise ValueError('unknown format: ' + outputFormat)
     build_html.exposed = True
 
-    def search(self, query):
+    def search(self, query, publicOnly=1):
+        publicOnly = int(publicOnly)
         l = mongo.text_search(self.coll, query, limit=100)
         searchDocs = [t[0] for t in l]
+        if publicOnly:
+            searchDocs = filter(is_public, searchDocs)
         outfile = os.path.join(self.sourceDir, 'results.rst')
         vanilla.render_docs(searchDocs, self.reformatter, outfile,
                             self.noCachePragma + '''
@@ -165,9 +190,11 @@ class Server(object):
 to jump to a specific document)
 
 ''' % len(searchDocs))
+        outputDir = self.get_output_dir(publicOnly)
+        webroot = os.path.basename(outputDir)
         cmdline.main(['sphinx-build',  # build desired output via sphinx
-                      self.sourceDir, self.buildDir, outfile])
-        return redirect('/docs/results.html')
+                      self.sourceDir, outputDir, outfile])
+        return redirect('/%s/results.html' % webroot)
     search.exposed = True
     
     def init_socraticqs(self, fname, stree):
@@ -206,7 +233,7 @@ Click here to launch the
     def index(self, **kwargs):
         if 'courseID' in cherrypy.session: # student interface
             return self.call_socraticqs('index', **kwargs)
-        return redirect('/docs/test.html') # test form for instructors
+        return redirect(self.startPage) # test form for instructors
     index.exposed = True
 
             
