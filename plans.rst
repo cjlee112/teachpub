@@ -18,7 +18,7 @@ Components of a basic scrubjay website
   * socraticqs: DONE
 
 * edit / save your own assemblies
-* search, browse units and assemblies from db
+* search, browse units and assemblies from db: DONE
 
   * should probably change text storage to a single
     string via '\n'.join(text), and convert
@@ -35,6 +35,17 @@ Components of a basic scrubjay website
   * we get back a bunch of matching records, show them to
     the user, let him copy _id to his select statements.
 
+Steps
+-----
+
+* register teachpub.org: DONE
+* write index() method: DONE
+* modify socraticqs to allow a root path other than /: DONE
+* ask webfaction about installing texlive DONE
+* unoconv?  frankly this might be a horrible security vulnerability...
+* write good examples showcasing page inclusion, URL inclusion,
+  PPT inclusion, rust select capabilities
+* store assembly docs (from 260 and c100) in db, 
 
 Questions
 ---------
@@ -56,8 +67,24 @@ To build with sphinx:
 from sphinx import cmdline
 cmdline.main(argv) # include filename target
 
+Initial assemblies interface (examples)
+---------------------------------------
 
+To begin with I want to showcase the set of materials we
+already have.  Could be as simple as a list of example
+assemblies.  Maybe best to make a tutorial with lots
+of embedded examples.
 
+* simple rust intro: A few slides DONE
+* simple remix example: OCW slides DONE
+* rust select slides example DONE
+* homework with solutions example DONE
+* lecture with concept tests example DONE
+* exam with spaces example DONE
+* (security example?) DONE
+* assigned reading example
+* rust source materials examples DONE
+* search example DONE
 
 
 website design steps
