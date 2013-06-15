@@ -65,7 +65,6 @@ def secure_questions(tree, publicOnly=True, replaceText=unauthorizedQ):
                .get('access', ()):
             nonpublic += 1 # count non-public questions
             if publicOnly: # block access
-                print 'block access, publicOnly=%d' % publicOnly
                 rtree = parse.parse_rust(replaceText.split('\n'), 'temp')
                 tree.children[i] = rtree.children[0]
     return nonpublic
@@ -82,17 +81,16 @@ def pdflatex(srcdir, fname, destdir):
                      '-interaction=batchmode', fname + '.tex'], cwd=srcdir)
     cprmtemp(tempDir, fname + '.pdf', destdir)
 
-def build_livetutorial(srcdir, destdir):
+def build_docs(srcdir='../sitedocs', destdir='staticroot/docs'):
     cmdline.main(['sphinx-build', '-b', 'html', srcdir, destdir])
 
 
 class Server(object):
     def __init__(self, sourceDir="sphinx_source", 
-                 buildDir='staticroot/docs', docIndex=None, formatIndex=None,
+                 buildDir='staticroot/remix', docIndex=None, formatIndex=None,
                  noCachePragma='', imageDir='sphinx_source', 
                  privateDir='staticroot/private', 
-                 liveTutorial='../livetutorial', 
-                 startPage='/docs/tutorial/basic.html', **kwargs):
+                 startPage='/docs/basic.html', **kwargs):
         if not docIndex:
             docIndex = mongo.DocIDIndex(**kwargs)
         if not formatIndex:
@@ -110,9 +108,6 @@ class Server(object):
         self.reformatter = vanilla.Reformatter(formatDict)
         self.noCachePragma = noCachePragma
         self.course = {}
-        if liveTutorial:
-            build_livetutorial(liveTutorial, 
-                               os.path.join(buildDir, 'tutorial'))
 
     def start(self):
         'start cherrypy server as background thread, retaining control of main thread'
@@ -142,8 +137,9 @@ class Server(object):
         usePDFpages = ctprep.check_fileselect(stree)
         parse.apply_select(stree)
         if outputFormat == 'socraticqs':
-            secure_questions(stree, True) # remove non-public questions
-            return self.init_socraticqs(fname, stree)
+            if publicOnly:
+                secure_questions(stree) # remove non-public questions
+            return self.init_socraticqs(fname, stree, publicOnly)
         nonpublic = secure_questions(stree, publicOnly)
         outputDir = self.get_output_dir(publicOnly or nonpublic == 0)
         outputDir = os.path.abspath(outputDir)
@@ -197,7 +193,7 @@ to jump to a specific document)
         return redirect('/%s/results.html' % webroot)
     search.exposed = True
     
-    def init_socraticqs(self, fname, stree):
+    def init_socraticqs(self, fname, stree, publicOnly=True):
         #qlist = setup_questions(stree)
         qset = ctprep.get_questions(stree)
         ctprep.save_question_csv(qset, fname + '.csv', parse.PostprocDict,
@@ -205,41 +201,50 @@ to jump to a specific document)
         adminIP = cherrypy.request.remote.ip
         cherrypy.session['courseID'] = fname
         dbfile = fname + '.db'
+        if publicOnly:
+            rootPath = '/socraticqs'
+        else:
+            rootPath = '/socraticqsp'
         self.course[fname] = socraticqs.web.Server(fname + '.csv',
                                                    adminIP=adminIP,
                                                    configPath=None,
                                                    mathJaxPath=None,
-                                                   dbfile=dbfile)
+                                                   dbfile=dbfile,
+                                                   rootPath=rootPath)
         return '''%d concept tests loaded.  Click here to launch the 
-<A HREF="/admin" TARGET="admin">instructor interface</A>.
+<A HREF="%s/admin" TARGET="admin">instructor interface</A>.
 Click here to launch the 
-<A HREF="/" TARGET="student">student interface</A>. 
-''' % len(qset.children)
-        
-    # forward the socraticqs web interface calls
-    socraticqsMethods = ('login', 'login_form', 'logout',
-                         'register_form', 'register', 'reconsider_form',
-                         'view', 'submit', 'admin', 'start_question',
-                         'qadmin', 'qassess', 'save_responses', 'exit')
-    for attr in socraticqsMethods:
-        exec '''%s=lambda self, **kwargs:self.call_socraticqs("%s", **kwargs)
-%s.exposed = True''' % (attr, attr, attr)
-    del socraticqsMethods, attr # don't leave clutter in class attributes
+<A HREF="%s/index" TARGET="student">student interface</A>. 
+''' % (len(qset.children), rootPath, rootPath)
 
-    def call_socraticqs(self, m, **kwargs):
-        courseID = cherrypy.session['courseID']
-        return getattr(self.course[courseID], m)(**kwargs)
+    def socraticqs(self, *args, **kwargs):
+        'pass requests to socraticqs server'
+        try:
+            s = self.course[cherrypy.session['courseID']]
+        except KeyError:
+            return redirect(self.startPage)
+        try:
+            m = args[0]
+        except IndexError:
+            m = 'index'
+        return getattr(s, m)(**kwargs) # call socraticqs method
+    socraticqs.exposed = True
+        
+    def socraticqsp(self, *args, **kwargs):
+        'stub for private socraticqs interface'
+        return self.socraticqs(*args, **kwargs)
+    socraticqsp.exposed = True
+
 
     def index(self, **kwargs):
-        if 'courseID' in cherrypy.session: # student interface
-            return self.call_socraticqs('index', **kwargs)
-        return redirect(self.startPage) # test form for instructors
+        return redirect(self.startPage)
     index.exposed = True
 
             
 
 
 if __name__ == '__main__':
+    build_docs()
     s = Server()
     print 'starting server...'
     s.start()
