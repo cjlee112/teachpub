@@ -244,8 +244,16 @@ Click here to launch the
 
 
 if __name__ == '__main__':
+    try:
+        with open('data.json') as ifile:
+            d = json.load(ifile)
+        kwargs = dict(host='mongodb://%(user)s:%(password)s@%(host)s/%(dbName)s'
+                      % d, port=d['port'], dbName=d['dbName'])
+    except IOError:
+        kwargs = {}
+
     build_docs()
-    s = Server()
+    s = Server(**kwargs)
     print 'starting server...'
     s.start()
 
