@@ -127,20 +127,21 @@ permits such re-use with attribution):
    :Author: (your name)
    :Organization: (your university)
 
-   .. title:: Bayesian Statistics
+   .. title:: Confounding Variables
 
    Overview
    --------
 
-   * today we'll review some basic principles of Bayesian statistics
+   * today we'll review some basic statistical issues in 
+     analyzing association studies:
 
-     * deFinetti Exchangeability
-     * Conjugate priors
-   * slides from Babak Shahbaba, UCI, via OpenCourseWare
+     * Confounding Variables
+     * Solutions
+   * slides from John McGready, Johns Hopkins Univ., via OpenCourseWare
 
-   .. select:: http://learn.uci.edu/ocw/courses/11w/37940/lecture2.pdf
-      * pages=9-13
-      * pages=23-26
+   .. select:: http://ocw.jhsph.edu/courses/StatisticalReasoning2/PDFs/2009/SR2_lec2a_McGready.pdf
+      * pages=5-9
+      * pages=16-19
 
    </textarea>
    <BR>Make:
