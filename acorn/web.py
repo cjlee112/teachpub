@@ -8,6 +8,7 @@ import json
 import os.path
 import tempfile
 import shutil
+import Queue
 
 
 def redirect(path='/', body=None, delay=0):
@@ -85,7 +86,7 @@ class Server(object):
     def __init__(self, sourceDir="sphinx_source", 
                  buildDir='staticroot/remix', docIndex=None, formatIndex=None,
                  noCachePragma='', imageDir='sphinx_source', 
-                 privateDir='staticroot/private', 
+                 privateDir='staticroot/private', maxUser=100,
                  startPage='/docs/basic.html', **kwargs):
         if not docIndex:
             docIndex = mongo.DocIDIndex(**kwargs)
@@ -104,6 +105,9 @@ class Server(object):
         self.reformatter = vanilla.Reformatter(formatDict)
         self.noCachePragma = noCachePragma
         self.course = {}
+        self.idQueue = Queue.Queue() # thread-safe container
+        self.maxUser = maxUser
+        self.load_userID()
 
     def start(self):
         'start cherrypy server as background thread, retaining control of main thread'
@@ -118,9 +122,31 @@ class Server(object):
         else:
             return self.privateDir
 
+    def load_userID(self):
+        for i in range(self.maxUser):
+            self.idQueue.put(i)
+
+    def next_userID(self):
+        while True:
+            try:
+                return self.idQueue.get_nowait()
+            except Queue.Empty:
+                self.load_userID()
+
+    def session_userID(self):
+        'get userID for this session, or allocate one if needed'
+        try:
+            return cherrypy.session['userID']
+        except KeyError:
+            userID = self.next_userID()
+            cherrypy.session['userID'] = userID
+            return userID
+
     def build_html(self, fname, selectText, outputFormat='html', publicOnly=1,
                    beamerTheme=None, docTitle='My Presentation', 
                    author='the Author'):
+        userID = self.session_userID()
+        fname = '%s_%d' % (fname, userID)
         publicOnly = int(publicOnly)
         rawtext = selectText.split('\n')
         stree,t,a = parse.parse_rust_docinfo(rawtext, fname, 
@@ -169,16 +195,18 @@ class Server(object):
             raise ValueError('unknown format: ' + outputFormat)
     build_html.exposed = True
 
-    def search(self, query, publicOnly=1):
+    def search(self, query, publicOnly=1, fname='results'):
+        userID = self.session_userID()
+        fname = '%s_%d' % (fname, userID)
         publicOnly = int(publicOnly)
         l = mongo.text_search(self.coll, query, limit=100)
         searchDocs = [t[0] for t in l]
         if publicOnly:
             searchDocs = filter(is_public, searchDocs)
-        outfile = os.path.join(self.sourceDir, 'results.rst')
+        outfile = os.path.join(self.sourceDir, fname + '.rst')
         vanilla.render_docs(searchDocs, self.reformatter, outfile,
                             self.noCachePragma + '''
-**Search results: %d documents** (click on titles shown on the left
+**Search results: %d documents** (click on titles shown on the sidebar
 to jump to a specific document)
 
 ''' % len(searchDocs))
@@ -186,7 +214,7 @@ to jump to a specific document)
         webroot = os.path.basename(outputDir)
         subprocess.call(['sphinx-build',  # build desired output via sphinx
                          self.sourceDir, outputDir, outfile])
-        return redirect('/%s/results.html' % webroot)
+        return redirect('/%s/%s.html' % (webroot, fname))
     search.exposed = True
     
     def init_socraticqs(self, fname, stree, publicOnly=True):
@@ -225,7 +253,9 @@ return to your TeachPub page.'''
         try:
             s = self.course[cherrypy.session['courseID']]
         except KeyError:
-            return redirect(self.startPage)
+            return redirect(self.startPage, 
+                            '''The instructor has closed this Socraticqs 
+session.  Returning to TeachPub homepage in 10 seconds...''', 10)
         try:
             m = args[0]
         except IndexError:
@@ -240,6 +270,7 @@ return to your TeachPub page.'''
 
 
     def index(self, **kwargs):
+        userID = self.session_userID() # immediately assign session userID
         return redirect(self.startPage)
     index.exposed = True
 
