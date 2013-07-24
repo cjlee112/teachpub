@@ -235,12 +235,29 @@ to jump to a specific document)
                                           shutdownFunc=self.end_socraticqs)
         socServer._teachpub_fname = fname
         self.course[fname] = socServer
-        return '''%d concept tests loaded.  Click here to launch the 
-<A HREF="%s/admin" TARGET="admin">instructor interface</A>.
-Click here to launch the 
-<A HREF="%s/index" TARGET="student">student interface</A>. 
-When your Socraticqs demo session is finished, you may click your
-browser's Back button to go back to your TeachPub page.
+        return '''<H1>Socraticqs Demo</H1>%d concept tests loaded.  
+<H2>Demo Instructions</H2>
+<LI>Click here to launch the 
+<A HREF="%s/admin" TARGET="admin">instructor interface</A>
+in a separate window.</LI>
+<LI>Click on a question to assign it to the class.</LI>
+<LI>In a real class, you would explain the question to the students,
+then click <B>Go</B> to start the answer period.</LI>
+<LI>Click here to launch the 
+<A HREF="%s/index" TARGET="student">student interface</A>
+in a separate window.</LI>
+<LI>Click the <B>Register</B> link to add a new student.
+You can enter any values you want for the student username, full name,
+and UID.</LI>
+<LI>Use the student interface to answer the question; use
+the instructor interface to watch the student's answer appear, etc.</LI>
+<LI>When your Socraticqs demo session is finished, close
+the instructor and student interface windows.  You may click your
+browser's Back button in this window to go back to your TeachPub page.</LI>
+
+An <A HREF="http://people.mbi.ucla.edu/leec/docs/socraticqs/" TARGET="socdocs">
+overview and complete documentation</A> of Socraticqs is available
+here.
 ''' % (len(qset.children), rootPath, rootPath)
 
     def end_socraticqs(self, socServer, msg):
