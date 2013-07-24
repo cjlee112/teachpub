@@ -8,10 +8,6 @@ import json
 import os.path
 import tempfile
 import shutil
-try:
-    from sphinx import cmdline
-except ImportError:
-    pass
 
 
 def redirect(path='/', body=None, delay=0):
@@ -82,7 +78,7 @@ def pdflatex(srcdir, fname, destdir):
     cprmtemp(tempDir, fname + '.pdf', destdir)
 
 def build_docs(srcdir='../sitedocs', destdir='staticroot/docs'):
-    cmdline.main(['sphinx-build', '-b', 'html', srcdir, destdir])
+    subprocess.call(['sphinx-build', '-b', 'html', srcdir, destdir])
 
 
 class Server(object):
@@ -159,15 +155,15 @@ class Server(object):
                       'w') as ifile:
                 json.dump(self.latexDocs, ifile)
             texDir = os.path.join(self.sourceDir, '_build', 'latex')
-            cmdline.main(['sphinx-build', '-b', outputFormat,
-                          self.sourceDir, texDir, 
-                          path]) # build latex
+            subprocess.call(['sphinx-build', '-b', outputFormat,
+                             self.sourceDir, texDir, 
+                             path]) # build latex
             pdflatex(texDir, fname, outputDir)
             return redirect('/%s/%s.pdf' % (webroot, fname))
         elif outputFormat == 'html':
-            cmdline.main(['sphinx-build', '-b', outputFormat,
-                          self.sourceDir, outputDir, 
-                          path]) # build html
+            subprocess.call(['sphinx-build', '-b', outputFormat,
+                             self.sourceDir, outputDir, 
+                             path]) # build html
             return redirect('/%s/%s.html' % (webroot, fname))
         else:
             raise ValueError('unknown format: ' + outputFormat)
@@ -188,8 +184,8 @@ to jump to a specific document)
 ''' % len(searchDocs))
         outputDir = self.get_output_dir(publicOnly)
         webroot = os.path.basename(outputDir)
-        cmdline.main(['sphinx-build',  # build desired output via sphinx
-                      self.sourceDir, outputDir, outfile])
+        subprocess.call(['sphinx-build',  # build desired output via sphinx
+                         self.sourceDir, outputDir, outfile])
         return redirect('/%s/results.html' % webroot)
     search.exposed = True
     
