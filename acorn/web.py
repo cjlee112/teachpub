@@ -201,17 +201,24 @@ to jump to a specific document)
             rootPath = '/socraticqs'
         else:
             rootPath = '/socraticqsp'
-        self.course[fname] = socraticqs.web.Server(fname + '.csv',
-                                                   adminIP=adminIP,
-                                                   configPath=None,
-                                                   mathJaxPath=None,
-                                                   dbfile=dbfile,
-                                                   rootPath=rootPath)
+        socServer = socraticqs.web.Server(fname + '.csv', adminIP=adminIP,
+                                          configPath=None, mathJaxPath=None,
+                                          dbfile=dbfile, rootPath=rootPath,
+                                          shutdownFunc=self.end_socraticqs)
+        socServer._teachpub_fname = fname
+        self.course[fname] = socServer
         return '''%d concept tests loaded.  Click here to launch the 
 <A HREF="%s/admin" TARGET="admin">instructor interface</A>.
 Click here to launch the 
 <A HREF="%s/index" TARGET="student">student interface</A>. 
+When your Socraticqs demo session is finished, you may click your
+browser's Back button to go back to your TeachPub page.
 ''' % (len(qset.children), rootPath, rootPath)
+
+    def end_socraticqs(self, socServer, msg):
+        del self.course[socServer._teachpub_fname] # disconnect server
+        return '''Your Socraticqs session is ended.  Close this tab to
+return to your TeachPub page.'''
 
     def socraticqs(self, *args, **kwargs):
         'pass requests to socraticqs server'
