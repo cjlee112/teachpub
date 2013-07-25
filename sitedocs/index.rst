@@ -6,11 +6,15 @@
 Welcome to TeachPub.org!
 ======================================
 
+To try out the TeachPub.org teaching materials and tools, see :doc:`basic`.
+For an overview of the TeachPub.org project, see :doc:`paper`.
+
 Contents:
 
 .. toctree::
    :maxdepth: 2
 
+   paper
    basic
 
 

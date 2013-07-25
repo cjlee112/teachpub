@@ -87,7 +87,7 @@ class Server(object):
                  buildDir='staticroot/remix', docIndex=None, formatIndex=None,
                  noCachePragma='', imageDir='sphinx_source', 
                  privateDir='staticroot/private', maxUser=100,
-                 startPage='/docs/basic.html', **kwargs):
+                 startPage='/docs/index.html', **kwargs):
         if not docIndex:
             docIndex = mongo.DocIDIndex(**kwargs)
         if not formatIndex:
