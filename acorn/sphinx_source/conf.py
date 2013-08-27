@@ -174,6 +174,8 @@ html_static_path = ['_static']
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'Socraticqsdoc'
 
+mathjax_path = 'https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML,Safe'
+
 
 # -- Options for LaTeX output --------------------------------------------------
 
