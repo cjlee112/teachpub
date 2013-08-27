@@ -39,17 +39,17 @@ materials distribution and student interaction, and YouTube-style video for
 delivering lectures) to increase the number of students who
 can take a single course to 100,000 or more.  In this paradigm,
 efficiency is to be attained by letting students converge to the
-very best teacher in the world for a given topic, obviating
+very "best" teacher in the world for a given topic, obviating
 the need for many other teachers who are offering
 similar (but presumably inferior) versions.  Leaving aside
-questions of assessment or learning efficacy of the MOOC model, many 
+questions about the actual learning efficacy of MOOCs, many 
 commentators seem to think that higher education will undergo
 such a consolidation as an almost inevitable consequence of
 its current inefficiency.
 
 And yet.  There might be other efficient models.  We note two
-fundamental discrepancies between MOOCs and established efficient
-information network models.  First, MOOCs are incompatible with
+fundamental discrepancies between MOOCs and established models
+for efficient information networks.  First, MOOCs are incompatible with
 the principles of *publication* that prevail in research.
 The purpose of publication is reuse -- to enable everyone to
 use a beneficial development (and to secure credit to its
@@ -66,19 +66,29 @@ could conceivably do (by contrast, in a closed-source model
 the invention is only made available with specific, limited
 capabilities that cannot be extended).
 
-These established models are often overlooked not only by
+These established models (publication, and open source) 
+are often overlooked not only by
 outside commentators, but even by institutional efforts to
 improve the efficiency of education.  For example, it is 
-ironic that the Open CourseWare consortium actually 
+ironic that the OpenCourseWare consortium actually 
 distributes *closed-source* materials (PDF format, which
-is designed to permit viewing only.  To express this in
-software development terms, this would be as if GitHub
-were restricted to simply offering downloads of binary
-executables!).
+is designed to permit viewing only).  That is, while OpenCourseWare
+explicitly allows free reuse in its legal license
+(Creative Commons Attribution 3.0), that freedom is
+severely constrained in practice by distributing a *non-editable*
+format.  OpenCourseWare users *cannot* do everything with the
+materials that the original author could do, precisely because
+the *source files* that enable the author to make whatever changes they
+want (e.g. Powerpoint file for a lecture) have been *withheld*.
+By definition that is closed-source, not open-source.
+The very existence of such a self-contradictory
+policy, and its apparent lack of controversy in the education
+field, suggest that this field does not really understand
+or appreciate the concept of "open source".
 
 Does this matter?  After all, as long as all *students* are
 able to access a MOOC, what does it matter if others are blocked
-from reusing it?  Again, let's translate that into software
+from reusing it?  Let's translate that into software
 terms: "as long as *consumers* are able to use Microsoft Windows,
 what does it matter that no one (but Microsoft) can see or 
 re-compile source code for the operating system everyone relies on?"
@@ -94,6 +104,10 @@ sources, for *purposes* other than that implemented by
 the original author, by *people* other than the original author.
 This is the difference between what one person or group ("the owner")
 can do with an idea, versus what the whole world can do.
+We will distinguish such different levels of reuse as
+*verbatim reuse* (using an identical copy of a distributed material), 
+*remixing*, *re-purposing*, and *unified collaboration* 
+(multiple people contributing improvements to the same material).
  
 We wish to propose a consortium for open source teaching 
 materials in bioinformatics, based on the following principles:
@@ -101,11 +115,11 @@ materials in bioinformatics, based on the following principles:
 * *teaching as publication*: contributing teaching materials
   should be treated as a form of publication.  Specifically,
   we wish to establish an "open market" where teaching materials
-  are published, and users can search for and use them.  Credit
-  would be automatic, both "forwards" (showing authorship to
-  readers) and "back" (tracking total usage and other metrics
-  of impact and efficacy) so that teaching impact can be
-  as visible and directly assessed as research.
+  are published, and users can search for and use them.
+  Contributed teaching materials are automatically peer reviewed 
+  and tracked for impact like any publication: that is, other instructors' 
+  choosing to reuse those materials constitutes peer review and 
+  also  tracks impact (e.g. total number of students using those materials).
 * *open source standards*: teaching materials should be
   published as open-source standard formats (e.g. text) rather than
   closed-source (e.g. PDF).  Materials should be annotated
@@ -116,8 +130,7 @@ materials in bioinformatics, based on the following principles:
   along with their own materials, and "remix" them into whatever
   form they need (e.g. slides; PDF homework assignment; online
   exercises; an exam, etc.).
-* *assessment security*: assessment (both "grading" of individual
-  students, and of teaching efficacy) is an essential function of
+* *robust security options*: test questions are an essential category of
   teaching materials.  Contributors of assessment materials
   (e.g. exam problems) need to be able to choose an appropriate
   usage security policy (e.g. "final exam only": no distribution
@@ -125,7 +138,7 @@ materials in bioinformatics, based on the following principles:
   and have assurance that only properly
   credentialed users (e.g. course instructors) can access their
   materials.
-* *public usage*: "self-study" is and has always been an important
+* *public online usage*: "self-study" is and has always been an important
   usage of textbooks, online course videos and other teaching materials.
   Therefore, all materials not specifically reserved for assessment will
   be public.
@@ -137,7 +150,8 @@ This could have several benefits, both for students and faculty:
   each instructor can draw on materials from a wide variety of
   experts, and thus can
   focus his contributions just on areas where he is expert.
-* *active-learning materials*: in our experience, the exercises
+* *easy adoption of active-learning materials*:
+  in our experience, the exercises
   in a typical assigned textbook are far from adequate for students to 
   actually learn the desired concepts and skills.  Empirically,
   the existing publication channels have failed to give students the
@@ -149,6 +163,26 @@ This could have several benefits, both for students and faculty:
   and Rosalind (a similar resource for learning bioinformatics
   algorithms).  We have focused our initial repository of
   materials on exercises and a variety of active learning problems.
+  TeachPub.org seeks to make it easy for an instructor to
+  add an active learning component to an existing course
+  (for example by asking a couple "concept test" questions per class),
+  first by providing easy online tools for actually doing this
+  (e.g. the Socraticqs In-Class Question System), and second
+  by providing a large repository of active learning questions
+  that anyone can use or contribute to.
+
+We feel that materials sharing and remixing are especially
+needed for a multidisciplinary field like bioinformatics, where we 
+often need to integrate material and skills from several fields
+(e.g. statistics and computer science) to teach a given bioinformatics
+topic.  Unfortunately existing textbooks each tend to represent a
+single kind of expertise (e.g. statistics) and thus is both
+"too little" (lacks many other needed aspects) and "too much"
+(assumes a lot of field-specific background and goals that
+are actually not appropriate for your class).  What we often
+need is the ability to remix exercises and materials from
+a variety of partially overlapping courses; fully open-source
+sharing is the natural way to do this.
 
 Results
 -------
@@ -156,7 +190,7 @@ Results
 We propose a teaching materials consortium, 
 TeachPub.org, to address these needs.
 Specifically, we have assembled a collection of online services
-for reusing teaching materials from throughout the internet, 
+for reusing and remixing teaching materials from throughout the internet, 
 and a repository of bioinformatics teaching materials designed
 for easy reuse.  Anyone can try out these services now at
 http://teachpub.org.
@@ -237,6 +271,16 @@ genomics and computational biology (for life science students)
 (add other peoples' courses here).  The initial material
 divides roughly as follows:
 
+* *lecture materials*: given the diverse ways instructors present lectures
+  (Powerpoint or its competitors; PDF slides; transparencies etc.),
+  reuse-tools must work with a variety of input formats.  Fortunately,
+  even (non-editable) PDF slides are valuable for this, because
+  the tools can automatically remix individual or sets of slides from
+  any PDF on the internet, combined with other sources.  We anticipate
+  that online editing and sharing services like Google Docs / Google Drive
+  will become an important component of reusing lecture materials
+  on TeachPub.org.
+
 * *problems, solutions and error models*:
   in our experience, the limited problems
   available in an assigned textbook for a course are often insufficient
@@ -274,31 +318,63 @@ divides roughly as follows:
   key ways in which a class "loses" its students (i.e. they misunderstand
   an important aspect of a concept).
 
-  In our view this is a good
-  example of how shared teaching materials can be better than
-  "private" teaching materials.  Textbooks simply do not 
-  undertake this kind of analysis.  Instructors likewise do not
-  see the wide range of error models on each concept unless
-  they actually run concept tests in every class session and
-  read all the student answers.  Even if they do, that information
-  is simply lost, i.e. it does not propagate to other
-  instructors.  Students themselves often don't
-  realize they've misunderstood, or cannot put a finger on exactly
-  where they went wrong (and hence cannot fix it).
-  By contrast, in a shared teaching materials repository,
-  faculty can each easily add error models they've observed
-  for a given question.  Not only will all users of that question
-  see these error models (and can address them in their teaching),
-  the Socraticqs in-class question system (see below) will automatically 
-  ask students answering this question whether they made any of
-  these known, common errors (and if they think they made a novel
-  error can flag their answer for further analysis by instructors).  
-  Identifying an individual student's error model could
-  be automatically linked to appropriate review and follow-up
-  exercises to correct the error, giving the student in effect
-  a custom tutorial tailored to their individual understanding.
-  Error models in TeachPub.org are derived from sample sizes
-  of 25 - 100 student answers per question.  Here is an example::
+* *reading materials*: in our view, textbooks represent the strongest
+  component of the traditional teaching materials landscape, and initially
+  we have not focused on this.  
+
+* *security*: graded (test) materials require security.
+  Instructors won't contribute such materials unless they're
+  assured that only authenticated instructors can access them,
+  and will follow a specified access policy.  A contributor
+  can specify one of the following access levels:
+
+  * public: for teaching (rather than test) materials.
+  * answer-restricted: the question but not the answer is public.
+  * question-restricted: the material is only accessible to
+    authenticated instructors.  
+  * final-exam-only: instructors may only use in final exams,
+    i.e. where no distribution of the question will ever occur,
+    and no exposure of the answer.
+  * private: only the contributor can access the question
+    (presumably to remix it with other materials on TeachPub.org);
+    later s/he may open it to other instructors.
+
+  Instructors will be authenticated by logging in with the
+  email address linked to their academic title by their
+  university's directory.
+
+* *public access*: All other users can access the public teaching materials, for
+  self-study.
+
+Why Open-Source Matters: the Case for Error Models
+..................................................
+
+In our view error models provide a good
+example of how shared teaching materials can be better than
+"private" teaching materials.  Textbooks simply do not 
+undertake this kind of analysis.  Instructors likewise do not
+see the wide range of error models on each concept unless
+they actually run concept tests in every class session and
+read all the student answers.  Even if they do, that information
+is simply lost, i.e. it does not propagate to other
+instructors.  Students themselves often don't
+realize they've misunderstood, or cannot put a finger on exactly
+where they went wrong (and hence cannot fix it).
+
+By contrast, in a shared teaching materials repository,
+faculty can each easily add error models they've observed
+for a given question.  Not only will all users of that question
+see these error models (and can address them in their teaching),
+the Socraticqs in-class question system (see below) will automatically 
+ask students answering this question whether they made any of
+these known, common errors (and if they think they made a novel
+error can flag their answer for further analysis by instructors).  
+Identifying an individual student's error model could
+be automatically linked to appropriate review and follow-up
+exercises to correct the error, giving the student in effect
+a custom tutorial tailored to their individual understanding.
+Error models in TeachPub.org are derived from sample sizes
+of 25 - 100 student answers per question.  Here is an example::
 
     :question: disease_test_condprob
       :title: Disease Test Question
@@ -367,46 +443,10 @@ divides roughly as follows:
       :error:
         Some people chased red herrings like "does *reliable* mean 95%? 97%?"
 
-* *lecture materials*: given the diverse ways instructors present lectures
-  (Powerpoint or its competitors; PDF slides; transparencies etc.),
-  reuse-tools must work with a variety of input formats.  Fortunately,
-  even (non-editable) PDF slides are valuable for this, because
-  the tools can automatically remix individual or sets of slides from
-  any PDF on the internet, combined with other sources.  We anticipate
-  that online editing and sharing services like Google Docs / Google Drive
-  will become an important component of reusing lecture materials
-  on TeachPub.org.
 
-* *reading materials*: in our view, textbooks represent the strongest
-  component of the traditional teaching materials landscape, and initially
-  we have not focused on this.  
 
-* *security*: graded (test) materials require security.
-  Instructors won't contribute such materials unless they're
-  assured that only authenticated instructors can access them,
-  and will follow a specified access policy.  A contributor
-  can specify one of the following access levels:
-
-  * public: for teaching (rather than test) materials.
-  * answer-restricted: the question but not the answer is public.
-  * question-restricted: the material is only accessible to
-    authenticated instructors.  
-  * final-exam-only: instructors may only use in final exams,
-    i.e. where no distribution of the question will ever occur,
-    and no exposure of the answer.
-  * private: only the contributor can access the question
-    (presumably to remix it with other materials on TeachPub.org);
-    later s/he may open it to other instructors.
-
-  Instructors will be authenticated by logging in with the
-  email address linked to their academic title by their
-  university's directory.
-
-* *public access*: All other users can access the public teaching materials, for
-  self-study.
-
-The Socraticqs In-Class Question System
-.......................................
+Real-time Interaction via the Socraticqs In-Class Question System
+.................................................................
 
 When a user "remixes" a set of materials for a class, TeachPub.org
 gives the option of automatically transferring "concept test"
@@ -442,6 +482,38 @@ LibreOffice, MathJax, and many others.
 Discussion
 ----------
 
+To our minds, the choice between closed-source vs. open-source
+models for education reflects differing assumptions about what
+problem they're trying to solve.  Both MOOCs and OpenCourseWare
+can be characterized as as
+"free, closed-source": they make their materials available
+for free, but in a read-only, closed-source form.
+This presupposes that the only audience we are
+trying to "open" the materials to is its *consumers*, i.e. 
+students, who only need to be able to view, but not modify, remix etc.
+This makes sense if we already know how teach a subject perfectly;
+i.e. already have the ideal teaching materials in hand, and it's
+simply a matter of improving the efficiency of the distribution
+system (i.e. deliver them to massive numbers of students at very low cost).
+It does *not* make sense if our teaching methods are ineffective
+and our teaching materials are in need of a community overhaul.
+Evidence from simple conceptual tests 
+(such as the Force Concept Inventory)
+indicate that courses even from the best universities
+are startlingly ineffective (e.g. a year of Harvard intro physics
+produced little improvement in Force Concept Inventory score).
+
+Since the current crisis in education concerns not only 
+issues of cost, but also basic failures of effectiveness and
+methodology, the closed-source model seems highly inappropriate.
+In our view, education now should be viewed as a *research* problem
+requiring the concerted efforts of the whole community to 
+discover, assess and share the most effective teaching methods
+and materials.  And this should follow the same open publication
+model that research follows, because that model makes
+the difference between what one person or group ("the owner")
+can do with an idea, versus what the whole world can do.
+
 We briefly summarize a comparison of this open-source approach
 with existing closed-source models (Table 1).  Note that not
 all closed-source models are strictly MOOC; for example, 
@@ -452,13 +524,6 @@ by TeachPub.org users).  One point which we wish to emphasize
 is that, unlike MOOCs, our model is strictly agnostic about
 online vs. traditional classroom instruction: it supports both
 equally.  
-
-(Indeed, MOOCs themselves can benefit from access
-to our materials. Hmm -- should we have a MOOC-copyleft clause?
-I.e. if you use TeachPub.org materials in a MOOC, you have
-to open-source your MOOC materials for that class "unit"
-under the same copyleft licence?
-Not clear that this is worth the trouble...)
 
 
 .. list-table:: Table 1: Comparison of teaching scalability models
@@ -488,23 +553,101 @@ Not clear that this is worth the trouble...)
    * - remix to multiple layouts?
      - No
      - Yes
+   * - user editable?
+     - No
+     - Yes
    * - secure sharing?
      - No
      - Yes
+   * - peer reviewed?
+     - No
+     - Yes, automatically tracked
    * - citation metrics?
      - total student usage (but no reuse and hence no citation) for Coursera; No for OpenCourseWare
-     - Yes
+     - Yes, automatically tracked
    * - concept indexing?
      - No
      - Yes
    * - version control?
      - No
      - Yes
-   * - collaborative editing?
+   * - unified collaboration?
      - No
      - Yes
 
-We also wish to suggest that universities should
+It goes without saying that the initial version of TeachPub.org
+is merely a prototype demonstrating the value and feasibility of
+some of these principles, not a production service ready for users
+to do all these things.  To assess these ideas more deeply, therefore,
+it is useful to examine the most advanced open-source community, 
+namely open-source software (OSS) development.  
+
+First, this provides a reality check:
+what is the actual value of remixing, re-purposing
+and unified collaboration (as opposed to verbatim reuse alone)?  
+In OSS, programmers take for granted
+that an application can make use of *multiple* software libraries
+(remixing), and that different applications can use a given library
+to achieve quite different purposes (re-purposing).  So we can ask:
+what fraction of applications depend on such remixing?
+If we were to eliminate applications that depend 
+on third-party OSS libraries, a large fraction of the world's software
+would vanish (e.g. Google, Android, Mac OS X / iOS, Firefox, Apache
+web server, Linux, etc.).  Second, OSS provides a model example of
+the benefits of *unified collaboration*: GitHub, an OSS collaboration 
+site ("social coding") with over 3 million members and 8 million
+software projects.  Again, we can ask what fraction of popular
+OSS applications depend on such collaboration for their development:
+the vast majority (for the obvious reason that the task of developing
+such an application is too big for one person or group, and benefits
+greatly from contributions from outside experts).
+
+To make this concrete, we will briefly sketch how the GitHub
+unified collaboration model would work for teaching materials.
+The first aspect is *distributed version control*, which not only records
+the complete history of all versions of a given material and
+their derivation from each other, but also can automatically
+merge different users' changes  (into a single version that combines
+everyone's contributions).  This "reunifies" their 
+divergent efforts, which would otherwise fragment the material
+into as many incompatible versions as it has users.  The second
+required aspect is that this process be made easy and automatic:
+e.g. every time an instructor makes a "product" (such as slides 
+to show in class) out of a given material, the system automatically
+saves a "snapshot" of whatever changes he's made vs. the material's
+source.  It notifies the original author and asks whether to
+automatically merge those changes back into the main version.
+Note that such unification has major benefits
+such as automatic peer review and impact tracking.
+
+Let's consider the effect this would have on just
+one aspect of teaching: error models.  Say one instructor
+uses a problem in a class, and annotates the error models
+observed in that class.  Any subsequent usage of this problem
+will automatically ask students (during self-assessment)
+whether they made any of those errors (and of course tracks
+these statistics), and also highlights to their instructor
+any *novel* errors.  Assuming the first set of error models
+covers 80% of students, this reduces the next instructor's
+effort by five-fold (he would only need to analyze the 20%
+that made novel errors).  The instructor can devote time
+instead to writing *remediations* (suggested review and 
+exercises for students to overcome a specific error model).
+As individual instructors contribute error models and
+remediations, the problem gradually transforms from being
+a one-shot "sink or swim" task (either you know it, or you don't),
+to becoming a full tutorial that gives each student individualized
+instruction, to identify their misconceptions about that
+problem, and to do the work to overcome them.  At the same time
+the system takes us from a sitation where progress is
+practically impossible (because assembling such a vast array of
+material for each problem is far too big for any one instructor),
+to a situation where each person need only contribute a little
+in order to accrue an enormous benefit from everyone else
+(each instructor is now part of something much bigger than
+himself).
+
+We wish to suggest that universities should
 welcome this teaching-as-publication model, first because
 it can improve teaching and learning, and second because
 it can reduce costs and improve efficiency.  Universities
@@ -512,20 +655,6 @@ should recognize that faculty have the right to publish
 teaching materials (either via a traditional textbook
 publisher or via TeachPub.org) just as they have a right
 to publish research.
-
-We feel that materials sharing and remixing are especially
-needed for a multidisciplinary field like bioinformatics, where we 
-often need to integrate material and skills from several fields
-(e.g. statistics and computer science) to teach a given bioinformatics
-topic.  Unfortunately existing textbooks each tend to represent a
-single kind of expertise (e.g. statistics) and thus is both
-"too little" (lacks many other needed aspects) and "too much"
-(assumes a lot of field-specific background and goals that
-are actually not appropriate for your class).  What we often
-need is the ability to remix exercises and materials from
-a variety of partially overlapping courses; fully open-source
-sharing is the natural way to do this.
-
 
 It goes without saying that our proposal only scratches
 the surface of what could become possible in a world of open
@@ -595,61 +724,4 @@ from their end-products.  By contrast, funding development of
 a MOOC would be like allowing a grantee to patent an 
 innovation (to block others from using it)
 without publishing the underlying research.
-
-TeachPub.org Foundations
-........................
-
-* *open source*:
-  Scalable sharing of teaching materials requires *open source*,
-  so that users can freely modify materials and automatically recombine
-  each others' changes.  We must distinguish several levels of openness:
-
-  * *closed source*: not designed to be modified by users (e.g. PDF).
-    Although OpenCourseWare explicitly licenses its content for
-    reuse, its repository materials are closed source (PDF).
-  * *forkable*: modifiable but not automatically mergeable
-    (e.g. traditional binary document formats).  In practice this
-    means that user modifications can become "Balkanized", stranded
-    in separate forks.  If *n* people modify the same content,
-    no one can reuse all their changes; instead one must
-    *choose* just one fork (and optionally merge additional
-    changes by hand).
-  * *sustainable reuse* (open source): forkable and automatically mergeable.
-    Fields that require highly scalable collaboration (e.g. software
-    development) have developed powerful tools such as distributed
-    version control systems (DVCS such as Git, Mercurial),
-    for which fully automatic merging of separate changes is a baseline
-    requirement.  Simple line-separated text formats (e.g. LaTeX;
-    reStructuredText) benefit from the full power of these tools.
-    TeachPub.org relies on this strong foundation of open
-    standards for scalable reuse.  Such standard formats are generally
-    automatically interconvertible, and also interconvertible
-    with binary "Office document" formats.
-  
-    
-* *units vs. assemblies*: we refer to an indivisible piece of
-  content (e.g. a multipart question, many of whose parts might
-  not make sense without previous parts) as a "unit".  Units
-  are the basic building block that users edit or select from
-  the TeachPub.org database.  Each unit will have its own
-  separate version control.  By contrast, a typical class
-  material (like a lecture or exam) is an *assembly* of multiple
-  units, and a complete course is an assembly of assemblies.
-  Instructors teaching similar courses may wish to reuse (and
-  modify) each other's assemblies.  Hence it makes sense to 
-  store assemblies in the repository (again each with its own
-  version control), and apply the same edit / select tools to them.
-
-* *metadata*: units in TeachPub.org are extensively annotated
-  with metadata that link them to each other and to external
-  resources.  Specifically, a series of standard predicates
-  (defines, tests, motivates, derives, illustrates, etc.) links each
-  unit to Wikipedia concept IDs.  Hence the content in TeachPub.org
-  can be considered a *concept graph* whose nodes are Wikipedia
-  concept IDs, and whose edges are units that relate one concept
-  to another in a specified way.  E.g. the Monty Hall problem
-  illustrates an example of Bayes' Law.  Initially, this enables 
-  TeachPub.org to provide links to Wikipedia; many other applications
-  are possible.
-
 
